@@ -1,81 +1,95 @@
-# Docker Setup for Cal State East Bay Food App
+# Docker Container for BigBites Project
 
-This repository contains the Docker setup for the Bigbites Food App, which serves static content using Nginx.
+## Overview
+
+This repository contains a Docker container for hosting a static website on an Amazon EC2 instance. The container includes all necessary software to run the website.
 
 ## Prerequisites
-- An AWS account to create an EC2 instance.
-- A Docker Hub account to push and pull Docker images.
-- Basic knowledge of terminal commands and SSH.
 
-## Creating an Amazon EC2 Instance
+- An AWS account
+- Basic knowledge of Docker and EC2
+- Docker installed on your local machine (optional for building images locally)
 
-1. **Log In to AWS Management Console**
-   - Go to the AWS Management Console and log in with your AWS account credentials.
+## Steps to Create and Deploy the Docker Container
 
-2. **Access the EC2 Dashboard**
-   - Use the search bar to type **EC2** and click on **EC2** from the search results.
+### 1. Set Up EC2 Instance
+- Launch an EC2 instance with Ubuntu (20.04 LTS recommended).
+- Configure security groups to allow HTTP and SSH access.
 
-3. **Launch a New EC2 Instance**
-   - Click the **Launch Instance** button.
+### 2. Install Docker on EC2
+- SSH into your instance:
+    ```bash
+    ssh -i /path/to/your-key.pem ubuntu@your-ec2-public-ip
+    ```
+- Install Docker:
+    ```bash
+    sudo apt update
+    sudo apt install docker.io
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    ```
 
-4. **Choose an Amazon Machine Image (AMI)**
-   - Select an **Ubuntu AMI** (ensure it is Free Tier eligible, such as Ubuntu 22.04 LTS).
+### 3. Clone the Repository (if applicable)
+- If your Docker setup is in a GitHub repository, clone it using:
+    ```bash
+    git clone https://github.com/YOUR_GITHUB_USERNAME/Project-1-Part2.git
+    cd Project-1-Part2/DockerContainer
+    ```
 
-5. **Choose an Instance Type**
-   - Select **t2.micro**, which is Free Tier eligible.
+### 4. Build the Docker Image
+- Run the following command to build your Docker image:
+    ```bash
+    docker build -t my-website .
+    ```
 
-6. **Configure Instance Details**
-   - Configure any specific details as needed (default settings are usually sufficient).
+### 5. Run the Docker Container
+- Run the container, mapping port 80:
+    ```bash
+    docker run -d -p 80:80 my-website
+    ```
 
-7. **Add Storage**
-   - Leave the default settings, typically an 8GB root volume.
+## Push the Docker Image to Docker Hub
 
-8. **Add Tags (Optional)**
-   - Add tags for better management, e.g., Key: **Name**, Value: **BigBite**.
+### 1. Log in to Docker Hub
+- If you haven’t logged in yet, use:
+    ```bash
+    docker login
+    ```
 
-9. **Configure Security Group**
-   - Create a new security group or select an existing one. 
-   - Add rules to allow necessary traffic:
-     - Type: **Custom TCP** | Protocol: **TCP** | Port Range: **8080** | Source: **Anywhere (0.0.0.0/0)**
-     - Type: **SSH** | Protocol: **TCP** | Port Range: **22** | Source: **My IP** (for security).
+### 2. Tag Your Image
+- Tag your Docker image so you can push it to Docker Hub:
+    ```bash
+    docker tag my-website YOUR_DOCKER_HUB_USERNAME/my-website
+    ```
 
-10. **Review and Launch**
-    - Review your configurations and click **Launch**.
-    - Create or select a key pair for SSH access, then download the key pair file (.pem).
+### 3. Push Your Image
+- Push your tagged image to your Docker Hub repository:
+    ```bash
+    docker push YOUR_DOCKER_HUB_USERNAME/my-website
+    ```
 
-11. **Access Your Instance**
-    - Note the **Public IPv4 address** of your EC2 instance from the Instances tab.
+## Accessing the Docker Image from Docker Hub on EC2
 
-## Docker Setup
+### 1. Pull the Docker Image from Docker Hub
+- If you need to run the Docker image from Docker Hub on another EC2 instance or the same instance after deleting the local image, use:
+    ```bash
+    docker pull YOUR_DOCKER_HUB_USERNAME/my-website
+    ```
 
-### Dockerfile
+### 2. Run the Pulled Image
+- Run the pulled image as you did before:
+    ```bash
+    docker run -d -p 80:80 YOUR_DOCKER_HUB_USERNAME/my-website
+    ```
 
-The Dockerfile for the Cal State East Bay Food App is as follows:
+### 3. Access Your Website
+- Open your web browser and navigate to `http://your-ec2-public-ip` to view your website.
 
-```dockerfile
-# Use a specific version of the official Nginx image
-FROM nginx:1.23
+## Video Documentation
 
-# Copy the HTML files to the Nginx HTML directory
-COPY ./home.html /usr/share/nginx/html/home.html
-COPY ./about.html /usr/share/nginx/html/about.html
-COPY ./contact.html /usr/share/nginx/html/contact.html
-COPY ./sample.html /usr/share/nginx/html/sample.html
+- For a detailed visual walkthrough, please refer to my [YouTube Video]([YOUR_YOUTUBE_VIDEO_LINK_HERE](https://youtu.be/gJpJ8b_uVkc)) that demonstrates the entire setup process, deployment, and accessing the website.
 
-# Copy CSS files to the Nginx HTML directory
-COPY ./style.css /usr/share/nginx/html/style.css
-COPY ./responsive-style.css /usr/share/nginx/html/responsive-style.css
-COPY ./contact.css /usr/share/nginx/html/contact.css
+## Conclusion
 
-# Copy JavaScript files to the Nginx HTML directory
-COPY ./js/main.js /usr/share/nginx/html/js/main.js
+This project showcases how to deploy a static website using Docker on an Amazon EC2 instance. The setup includes all necessary configurations and provides a streamlined process for both local and cloud deployments.
 
-# Copy images to the Nginx HTML directory
-COPY ./imgs /usr/share/nginx/html/imgs
-COPY ./Screenshot /usr/share/nginx/html/Screenshot
-
-# Copy the custom Nginx configuration file
-COPY ./default.conf /etc/nginx/conf.d/
-
-# Expose port 80
-EXPOSE 80
