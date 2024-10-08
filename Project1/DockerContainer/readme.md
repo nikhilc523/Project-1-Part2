@@ -87,7 +87,7 @@ This repository contains a Docker container for hosting a static website on an A
 
 ## Video Documentation
 
-- For a detailed visual walkthrough, please refer to my [YouTube Video]([YOUR_YOUTUBE_VIDEO_LINK_HERE](https://youtu.be/gJpJ8b_uVkc)) that demonstrates the entire setup process, deployment, and accessing the website.
+- For a detailed visual walkthrough, please refer to my [YouTube Video]((https://youtu.be/gJpJ8b_uVkc)) that demonstrates the entire setup process, deployment, and accessing the website.
 
 ## Conclusion
 
